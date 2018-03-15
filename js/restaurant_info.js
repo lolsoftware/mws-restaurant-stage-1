@@ -1,22 +1,19 @@
 let restaurant;
 var map;
+var fetchRestaurantPromise = null;
 
 /**
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
-  fetchRestaurantFromURL((error, restaurant) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
-      });
-      fillBreadcrumb();
-      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
-    }
+  fetchRestaurantPromise.then(function(){
+    self.map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 16,
+      center: self.restaurant.latlng,
+      scrollwheel: false
+    });
+
+    DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
   });
 }
 
@@ -56,8 +53,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img'
+  image.className = "restaurant-img";
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.srcset = DBHelper.smallImageUrlForRestaurant(restaurant) + " 500w, " + 
+    DBHelper.mediumImageUrlForRestaurant(restaurant) + " 650w, " +
+    DBHelper.imageUrlForRestaurant(restaurant) + " 800w";
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
@@ -117,21 +117,32 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
  */
 createReviewHTML = (review) => {
   const li = document.createElement('li');
+  const divTitle = document.createElement('div');
+  divTitle.className = "review-title";
+  li.appendChild(divTitle);
+
   const name = document.createElement('p');
+  name.className = "review-author";
   name.innerHTML = review.name;
-  li.appendChild(name);
+  divTitle.appendChild(name);
 
   const date = document.createElement('p');
+  date.className = "review-date";
   date.innerHTML = review.date;
-  li.appendChild(date);
+  divTitle.appendChild(date);
+
+  const divBody = document.createElement('div');
+  divBody.className = "review-body";
+  li.appendChild(divBody);
 
   const rating = document.createElement('p');
+  rating.className = "review-rating";
   rating.innerHTML = `Rating: ${review.rating}`;
-  li.appendChild(rating);
+  divBody.appendChild(rating);
 
   const comments = document.createElement('p');
   comments.innerHTML = review.comments;
-  li.appendChild(comments);
+  divBody.appendChild(comments);
 
   return li;
 }
@@ -139,7 +150,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant=self.restaurant) => {
+fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
@@ -161,3 +172,19 @@ getParameterByName = (name, url) => {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+init = () => {
+  fetchRestaurantPromise = new Promise(function (resolve, reject) {
+    fetchRestaurantFromURL((error, restaurant) => {
+      if (error) { // Got an error!
+        console.error(error);
+        reject(error);
+      } else {
+        fillBreadcrumb();
+        resolve();
+      }
+    });
+  })
+}
+
+init();

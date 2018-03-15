@@ -154,15 +154,41 @@ class DBHelper {
   }
 
   /**
+   * Restaurant medium image URL.
+   */
+  static mediumImageUrlForRestaurant(restaurant) {
+    return (`/img/medium/${restaurant.photograph}`);
+  }
+
+  /**
+   * Restaurant small image URL.
+   */
+  static smallImageUrlForRestaurant(restaurant) {
+    return (`/img/small/${restaurant.photograph}`);
+  }
+
+  /**
+   * Restaurant miniature image URL.
+   */
+  static miniatureImageUrlForRestaurant(restaurant) {
+    return (`/img/miniature/${restaurant.photograph}`);
+  }
+
+  /**
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {
+    if (map == null) {
+      return;
+    }
+
     const marker = new google.maps.Marker({
       position: restaurant.latlng,
       title: restaurant.name,
       url: DBHelper.urlForRestaurant(restaurant),
       map: map,
-      animation: google.maps.Animation.DROP}
+      animation: google.maps.Animation.DROP
+    }
     );
     return marker;
   }

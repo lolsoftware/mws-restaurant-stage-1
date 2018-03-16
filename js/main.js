@@ -165,7 +165,7 @@ createRestaurantHTML = (restaurant) => {
 
   const image = document.createElement('img');
   image.className = 'restaurant-img';
-  image.alt = "Picture of the restaurant";
+  image.alt = `Picture of the "${restaurant.name}" restaurant`;
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   image.srcset = DBHelper.miniatureImageUrlForRestaurant(restaurant) + " 270w, " +
     DBHelper.smallImageUrlForRestaurant(restaurant) + " 500w, " +
@@ -174,8 +174,9 @@ createRestaurantHTML = (restaurant) => {
   image.sizes = "(max-width: 800px) 100vw, 270px";
   li.append(image);
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
+  name.tabIndex = 0;
   li.append(name);
 
   const neighborhood = document.createElement('p');

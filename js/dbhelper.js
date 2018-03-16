@@ -4,50 +4,96 @@
 class DBHelper {
 
   /**
-   * Database URL.
-   * Change this to restaurants.json file location on your server.
+   * Database port.
    */
-  static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+  static get PORT() {
+    const port = 1337; // Change this to your server port
+    return port;
+  }
+
+  static openIDB() {
+    const dbPromise = idb.open('restaurant-db', 1, upgradeDB => {
+      upgradeDB.createObjectStore('restaurant');
+    });
+
+    return dbPromise;
+  }
+
+  static insertToIDB(restaurantId, json) {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      const tx = db.transaction('restaurant', 'readwrite');
+      tx.objectStore('restaurant').put(json, restaurantId);
+      return tx.complete;
+    });
+  }
+
+  static selectFromIDB(restaurantId) {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      return db.transaction('restaurant')
+        .objectStore('restaurant').get(restaurantId);
+    });
+  }
+
+  static fetchRestaurantFromServer(id) {
+    const url = `http://localhost:${DBHelper.PORT}/restaurants/${id}`;
+    return fetch(url)
+      .then(function (response) {
+        return response.json();
+      });
+  }
+
+  static fetchRestaurantListFromServer() {
+    const url = `http://localhost:${DBHelper.PORT}/restaurants`;
+    return fetch(url)
+      .then(function (response) {
+        return response.json();
+      });
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json.restaurants;
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+    DBHelper.selectFromIDB('all')
+      .then(function (jsonRestaurants) {
+        if (jsonRestaurants != null) {
+          return jsonRestaurants;
+        }
+
+        return DBHelper.fetchRestaurantListFromServer();
+      })
+      .then(function (jsonRestaurants) {
+        DBHelper.insertToIDB('all', jsonRestaurants);
+        callback(null, jsonRestaurants);
+      })
+      .catch(function (error) {
+        const errorMsg = (`Request failed. Error message: ${error.message}`);
+        callback(errorMsg, null);
+      });
   }
 
   /**
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    // fetch all restaurants with proper error handling.
-    DBHelper.fetchRestaurants((error, restaurants) => {
-      if (error) {
-        callback(error, null);
-      } else {
-        const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) { // Got the restaurant
-          callback(null, restaurant);
-        } else { // Restaurant does not exist in the database
-          callback('Restaurant does not exist', null);
+    DBHelper.selectFromIDB(id)
+      .then(function (jsonRestaurant) {
+        if (jsonRestaurant != null) {
+          return jsonRestaurant;
         }
-      }
-    });
+
+        return DBHelper.fetchRestaurantFromServer(id);
+      })
+      .then(function (jsonRestaurant) {
+        DBHelper.insertToIDB(id, jsonRestaurant);
+        callback(null, jsonRestaurant);
+      })
+      .catch(function (error) {
+        const errorMsg = (`Request failed. Error message: ${error.message}`);
+        callback(errorMsg, null);
+      });
   }
 
   /**
@@ -150,28 +196,28 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    return (`/img/${restaurant.photograph}.jpg`);
   }
 
   /**
    * Restaurant medium image URL.
    */
   static mediumImageUrlForRestaurant(restaurant) {
-    return (`/img/medium/${restaurant.photograph}`);
+    return (`/img/medium/${restaurant.photograph}.jpg`);
   }
 
   /**
    * Restaurant small image URL.
    */
   static smallImageUrlForRestaurant(restaurant) {
-    return (`/img/small/${restaurant.photograph}`);
+    return (`/img/small/${restaurant.photograph}.jpg`);
   }
 
   /**
    * Restaurant miniature image URL.
    */
   static miniatureImageUrlForRestaurant(restaurant) {
-    return (`/img/miniature/${restaurant.photograph}`);
+    return (`/img/miniature/${restaurant.photograph}.jpg`);
   }
 
   /**
@@ -187,7 +233,7 @@ class DBHelper {
       title: restaurant.name,
       url: DBHelper.urlForRestaurant(restaurant),
       map: map,
-      animation: google.maps.Animation.DROP
+      animation: null //google.maps.Animation.DROP
     }
     );
     return marker;

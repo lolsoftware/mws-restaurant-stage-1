@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#252831"/>
+  <link rel="manifest" href="/manifest.webmanifest">
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
-  <link rel="stylesheet" href="css/styles.css" type="text/css">
+  <link rel="stylesheet" href="css/styles.css" />
   <title>Restaurant Info</title>
 </head>
 
@@ -78,11 +80,11 @@
   <!-- End footer -->
 
   <!-- Beginning scripts -->
-  <script type="application/javascript" charset="utf-8" src="js/init-sw.js"></script>
-  <!-- Database helpers -->
-  <script type="text/javascript" src="js/dbhelper.js"></script>
-  <!-- Main javascript file -->
-  <script type="text/javascript" src="js/restaurant_info.js"></script>
+  <script src="js/init-sw.js"></script>
+  <script src="js/idb.js"></script>
+  <script src="js/dbhelper.js"></script>
+  <script src="js/iolazy.min.js"></script>
+  <script src="js/restaurant_info.js"></script>
   <!-- Google Maps -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3f9BNPXItMT8PZkfqlP7gNjzc4jBT4v8&libraries=places&callback=initMap"></script>
   <!-- End scripts -->

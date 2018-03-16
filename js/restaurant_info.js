@@ -53,11 +53,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   address.innerHTML = restaurant.address;
 
   const image = document.getElementById('restaurant-img');
-  image.className = "restaurant-img";
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.srcset = DBHelper.smallImageUrlForRestaurant(restaurant) + " 500w, " + 
+  image.className = "restaurant-img lazyload";
+  //image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.setAttribute('data-srcset', DBHelper.smallImageUrlForRestaurant(restaurant) + " 500w, " + 
     DBHelper.mediumImageUrlForRestaurant(restaurant) + " 650w, " +
-    DBHelper.imageUrlForRestaurant(restaurant) + " 800w";
+    DBHelper.imageUrlForRestaurant(restaurant) + " 800w");
   image.alt = `Picture of the "${restaurant.name}" restaurant`;
 
   const cuisine = document.getElementById('restaurant-cuisine');
@@ -190,7 +190,11 @@ init = () => {
         resolve();
       }
     });
-  })
+  }).then(function(){
+    new IOlazy({
+      image: '.lazyload'
+    });
+  });;
 }
 
 init();

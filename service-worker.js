@@ -8,7 +8,9 @@ const PRECACHE_URLS = [
   'js/init-sw.js',
   'js/main.js',
   'js/restaurant_info.js',
-  'js/dbhelper.js'
+  'js/dbhelper.js',
+  'js/idb.js',
+  'js/iolazy.min.js'
 ];
 
 // Precache the core resources.

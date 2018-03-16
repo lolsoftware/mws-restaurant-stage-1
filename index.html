@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#252831"/>
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <link rel="stylesheet" href="css/styles.css">
   <title>Restaurant Reviews</title>
@@ -36,9 +38,11 @@
     </section>
   </main>
 
-  <script type="application/javascript" charset="utf-8" src="js/init-sw.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
+  <script src="js/init-sw.js"></script>
+  <script src="js/idb.js"></script>
+  <script src="js/dbhelper.js"></script>
+  <script src="js/iolazy.min.js"></script>
+  <script src="js/main.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3f9BNPXItMT8PZkfqlP7gNjzc4jBT4v8&libraries=places&callback=initMap"></script>
 
 

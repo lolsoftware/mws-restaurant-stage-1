@@ -76,6 +76,7 @@ window.initMap = () => {
     lat: 40.722216,
     lng: -73.987501
   };
+
   self.map = new google.maps.Map(document.getElementById('map'), {
     zoom: 12,
     center: loc,
@@ -164,13 +165,13 @@ createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
   const image = document.createElement('img');
-  image.className = 'restaurant-img';
+  image.className = 'restaurant-img lazyload';
   image.alt = `Picture of the "${restaurant.name}" restaurant`;
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.srcset = DBHelper.miniatureImageUrlForRestaurant(restaurant) + " 270w, " +
+  //image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.setAttribute('data-srcset', DBHelper.miniatureImageUrlForRestaurant(restaurant) + " 270w, " +
     DBHelper.smallImageUrlForRestaurant(restaurant) + " 500w, " +
     DBHelper.mediumImageUrlForRestaurant(restaurant) + " 650w, " +
-    DBHelper.imageUrlForRestaurant(restaurant) + " 800w";
+    DBHelper.imageUrlForRestaurant(restaurant) + " 800w");
   image.sizes = "(max-width: 800px) 100vw, 270px";
   li.append(image);
 
@@ -214,6 +215,11 @@ init = () => {
   updateRestaurantsPromise = new Promise(function (resolve, reject) {
     updateRestaurants(resolve, reject);
   })
+  .then(function(){
+    new IOlazy({
+      image: '.lazyload'
+    });
+  });
 }
 
 init();

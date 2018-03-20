@@ -1,7 +1,6 @@
 # Mobile Web Specialist Certification Course
 ---
-## _Restaurant Reviews Project: Stage 2_
-#### Passed on 16 March 2018
+## _Restaurant Reviews Project: Stage 3_
 
 ### Project Overview
 

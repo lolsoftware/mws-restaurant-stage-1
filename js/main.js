@@ -156,6 +156,9 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
     noRestaurants.style.display = "block";
     ul.classList.add('hidden');
   }
+  else {
+    observeImageScroll();
+  }
 }
 
 /**
@@ -211,15 +214,67 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 }
 
+onImgElemShown = (entries, observer) => {
+  if (entries.length > 0 &&
+    entries[0].isIntersecting) {
+
+    var image = entries[0].target;
+    observer.unobserve(image);
+
+    image.setAttribute('srcset', image.getAttribute('data-srcset'));
+  }
+}
+
+observeImageScroll = () => {
+  const images = document.querySelectorAll('.lazyload').forEach(function (image) {
+    const imgObserver = new IntersectionObserver(onImgElemShown, {});
+    imgObserver.observe(image);
+  });
+}
+
+onMapElemShown = (entries, observer) => {
+  if (entries.length > 0 &&
+    entries[0].isIntersecting) {
+
+    const mapContainer = document.querySelector('#map-container');
+    observer.unobserve(mapContainer);
+
+    const mapScript = document.createElement('script');
+    mapScript.setAttribute('src', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyD3f9BNPXItMT8PZkfqlP7gNjzc4jBT4v8&libraries=places&callback=initMap');
+    document.head.appendChild(mapScript);
+  }
+}
+
+observeMapScroll = () => {
+  const mapObserver = new IntersectionObserver(onMapElemShown, {});
+  const mapContainer = document.querySelector('#map-container');
+  mapObserver.observe(mapContainer);
+}
+
+registerOnlineEventHandler = () => {
+  function handleConnectionChange(event) {
+    if (event.type == "offline") {
+      console.log("You are offline.");
+    }
+    else if (event.type == "online") {
+      console.log("You are back online.");
+
+      DBHelper.sendPostponedRequests();
+    }
+  }
+
+  window.addEventListener('online', handleConnectionChange);
+  window.addEventListener('offline', handleConnectionChange);
+}
+
 init = () => {
   updateRestaurantsPromise = new Promise(function (resolve, reject) {
     updateRestaurants(resolve, reject);
   })
-  .then(function(){
-    new IOlazy({
-      image: '.lazyload'
-    });
-  });
+    .then(() => observeMapScroll());
+
+  registerOnlineEventHandler();
+  DBHelper.sendPostponedRequests();
 }
 
 init();

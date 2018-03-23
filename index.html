@@ -3,7 +3,7 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#252831"/>
+  <meta name="theme-color" content="#252831" />
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <link rel="stylesheet" href="css/styles.css">
@@ -20,10 +20,7 @@
   </header>
 
   <main id="maincontent">
-    <section id="map-container" role="application" aria-label="Map with restaurants">
-      <div id="map"></div>
-    </section>
-    <section>
+    <section id="restaurant-container">
       <div class="filter-options">
         <h2>Filter Results</h2>
         <select id="neighborhoods-select" name="neighborhoods" onchange="onFilterChange()">
@@ -36,15 +33,16 @@
       <ul id="restaurants-list"></ul>
       <p id="no-restaurants" style="display: none;">No restaurants meet your criteria.</p>
     </section>
+
+    <section id="map-container" role="application" aria-label="Map with restaurants">
+      <div id="map"></div>
+    </section>
   </main>
 
   <script src="js/init-sw.js"></script>
-  <script src="js/idb.js"></script>
+  <script src="js/idb.min.js"></script>
   <script src="js/dbhelper.js"></script>
-  <script src="js/iolazy.min.js"></script>
   <script src="js/main.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3f9BNPXItMT8PZkfqlP7gNjzc4jBT4v8&libraries=places&callback=initMap"></script>
-
 
   <footer id="footer">
     Copyright (c) 2018

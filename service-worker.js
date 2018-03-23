@@ -5,12 +5,12 @@ const RUNTIME = 'runtime';
 const PRECACHE_URLS = [
   'index.html',
   'css/styles.css',
+  'css/restaurant.css',
   'js/init-sw.js',
   'js/main.js',
   'js/restaurant_info.js',
   'js/dbhelper.js',
-  'js/idb.js',
-  'js/iolazy.min.js'
+  'js/idb.min.js'
 ];
 
 // Precache the core resources.
@@ -42,7 +42,7 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       caches.match(event.request).then(cachedResponse => {
         if (cachedResponse) {
-          return cachedResponse;
+          return cachedResponse; 
         }
 
         return caches.open(RUNTIME).then(cache => {

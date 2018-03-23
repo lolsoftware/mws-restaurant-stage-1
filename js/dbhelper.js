@@ -14,12 +14,15 @@ class DBHelper {
   static openIDB() {
     const dbPromise = idb.open('restaurant-db', 1, upgradeDB => {
       upgradeDB.createObjectStore('restaurant');
+      upgradeDB.createObjectStore('review');
+      upgradeDB.createObjectStore('postponedRestaurant');
+      upgradeDB.createObjectStore('postponedReview');
     });
 
     return dbPromise;
   }
 
-  static insertToIDB(restaurantId, json) {
+  static insertRestaurantToIDB(restaurantId, json) {
     const dbPromise = DBHelper.openIDB();
     return dbPromise.then(db => {
       const tx = db.transaction('restaurant', 'readwrite');
@@ -28,11 +31,88 @@ class DBHelper {
     });
   }
 
-  static selectFromIDB(restaurantId) {
+  static selectRestaurantFromIDB(restaurantId) {
     const dbPromise = DBHelper.openIDB();
     return dbPromise.then(db => {
       return db.transaction('restaurant')
         .objectStore('restaurant').get(restaurantId);
+    });
+  }
+
+  static insertReviewsToIDB(restaurantId, json) {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      const tx = db.transaction('review', 'readwrite');
+      tx.objectStore('review').put(json, restaurantId);
+      return tx.complete;
+    });
+  }
+
+  static selectReviewsFromIDB(restaurantId) {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      return db.transaction('review')
+        .objectStore('review').get(restaurantId);
+    });
+  }
+
+  static selectPostponedReviewsFromIDB() {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      return db.transaction('postponedReview')
+        .objectStore('postponedReview').getAll();
+    });
+  }
+
+  static selectFirstPostponedReviewFromIDB() {
+    return DBHelper.selectPostponedReviewsFromIDB()
+      .then(function (postponedReviewList) {
+        if (postponedReviewList.length > 0) {
+          return postponedReviewList[0];
+        }
+
+        return null;
+      });
+  }
+
+  static selectPostponedRestaurantsFromIDB() {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      return db.transaction('postponedRestaurant')
+        .objectStore('postponedRestaurant').getAll();
+    });
+  }
+
+  static selectFirstPostponedRestaurantFromIDB() {
+    return DBHelper.selectPostponedRestaurantsFromIDB()
+      .then(function (postponedRestaurantList) {
+        if (postponedRestaurantList.length > 0) {
+          return postponedRestaurantList[0];
+        }
+
+        return null;
+      });
+  }
+
+  static deletePostponedReviewFromIDB(key) {
+    console.log('Deleting a postponed review as it has been posted');
+
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      const tx = db.transaction('postponedReview', 'readwrite');
+      tx.objectStore('postponedReview').delete(key);
+      return tx.complete;
+    });
+  }
+
+  static deletePostponedRestaurantFromIDB(restaurantId) {
+    console.log('Deleting a postponed favorite change as it has been posted');
+
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      const tx = db.transaction('postponedRestaurant', 'readwrite');
+      tx.objectStore('postponedRestaurant').delete(restaurantId);
+      return tx.complete;
     });
   }
 
@@ -52,11 +132,108 @@ class DBHelper {
       });
   }
 
+  static fetchReviewsFromServer(restaurantId) {
+    const url = `http://localhost:${DBHelper.PORT}/reviews/?restaurant_id=${restaurantId}`;
+    return fetch(url)
+      .then(function (response) {
+        return response.json();
+      });
+  }
+
+  /*
+  newReview = {
+    "restaurant_id": <restaurant_id>,
+    "name": <reviewer_name>,
+    "rating": <rating>,
+    "comments": <comment_text>
+  }
+  */
+  static postReview(newReview) {
+    const url = `http://localhost:${DBHelper.PORT}/reviews/`;
+    return fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(newReview),
+      headers: new Headers({
+        'Content-Type': 'application/json'
+      })
+    }).then(function (response) {
+      return response.json();
+    }).then(function (reviewFromServer) {
+      //Append the new review to the review list for this restaurant in the IDB.
+      DBHelper.selectReviewsFromIDB(newReview.restaurant_id)
+        .then(function (jsonReviews) {
+          if (jsonReviews != null) {
+            jsonReviews.push(reviewFromServer);
+            DBHelper.insertReviewsToIDB(reviewFromServer.restaurant_id, jsonReviews);
+          }
+        });
+    });
+  }
+
+  static postRestaurant(restaurant) {
+    const isFavorite = (restaurant.is_favorite == "true");
+    const trueFalse = (isFavorite)
+      ? "true"
+      : "false";
+
+    const url = `http://localhost:${DBHelper.PORT}/restaurants/${restaurant.id}/?is_favorite=${trueFalse}`;
+    return fetch(url, {
+      method: 'PUT',
+      body: restaurant.id
+    }).then(function (response) {
+      return response.json();
+    });
+  }
+
+  /**
+ * Fetch reviews of a given restaurants.
+ */
+  static fetchReviews(restaurantId) {
+    //First fetch reviews from the server, and if that fails, only then fetch review from the IDB.
+    //This way if some different user adds a review, I will see it too (and not only the old set of review from the IDB).
+    const promiseReviews = DBHelper.fetchReviewsFromServer(restaurantId)
+      .catch(function () {
+        return DBHelper.selectReviewsFromIDB(restaurantId);
+      })
+      .then(function (jsonReviews) {
+        if (jsonReviews != null) {
+          DBHelper.insertReviewsToIDB(restaurantId, jsonReviews);
+
+          //We need to make a copy of the array, as DBHelper.insertReviewsToIDB returns a promise.
+          //So at this point the array is not yet stored in the IDB. And we are about to add the pending
+          //reviews to this array (if there are any), so these must be two separate arrays, otherwise the pending
+          //reviews would be stored in the IDB, which is not what we want.
+          const jsonReviewsCopy = jsonReviews.slice();
+          return jsonReviewsCopy;
+        }
+
+        return null;
+      });
+
+    const promisePostponed = DBHelper.selectPostponedReviewsFromIDB();
+
+    return Promise.all([promiseReviews, promisePostponed])
+      .then(function (results) {
+        const jsonReviews = results[0];
+        const postponedReviewList = results[1];
+
+        if (jsonReviews != null && postponedReviewList != null) {
+          for (const postponedReview of postponedReviewList) {
+            if (postponedReview.restaurant_id == restaurantId) {
+              jsonReviews.push(postponedReview);
+            }
+          }
+        }
+
+        return jsonReviews;
+      });
+  }
+
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    DBHelper.selectFromIDB('all')
+    DBHelper.selectRestaurantFromIDB('all')
       .then(function (jsonRestaurants) {
         if (jsonRestaurants != null) {
           return jsonRestaurants;
@@ -65,7 +242,7 @@ class DBHelper {
         return DBHelper.fetchRestaurantListFromServer();
       })
       .then(function (jsonRestaurants) {
-        DBHelper.insertToIDB('all', jsonRestaurants);
+        DBHelper.insertRestaurantToIDB('all', jsonRestaurants);
         callback(null, jsonRestaurants);
       })
       .catch(function (error) {
@@ -78,7 +255,7 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
-    DBHelper.selectFromIDB(id)
+    DBHelper.selectRestaurantFromIDB(id)
       .then(function (jsonRestaurant) {
         if (jsonRestaurant != null) {
           return jsonRestaurant;
@@ -87,7 +264,7 @@ class DBHelper {
         return DBHelper.fetchRestaurantFromServer(id);
       })
       .then(function (jsonRestaurant) {
-        DBHelper.insertToIDB(id, jsonRestaurant);
+        DBHelper.insertRestaurantToIDB(id, jsonRestaurant);
         callback(null, jsonRestaurant);
       })
       .catch(function (error) {
@@ -196,28 +373,28 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}.jpg`);
+    return (`/img/${restaurant.photograph}.webp`);
   }
 
   /**
    * Restaurant medium image URL.
    */
   static mediumImageUrlForRestaurant(restaurant) {
-    return (`/img/medium/${restaurant.photograph}.jpg`);
+    return (`/img/medium/${restaurant.photograph}.webp`);
   }
 
   /**
    * Restaurant small image URL.
    */
   static smallImageUrlForRestaurant(restaurant) {
-    return (`/img/small/${restaurant.photograph}.jpg`);
+    return (`/img/small/${restaurant.photograph}.webp`);
   }
 
   /**
    * Restaurant miniature image URL.
    */
   static miniatureImageUrlForRestaurant(restaurant) {
-    return (`/img/miniature/${restaurant.photograph}.jpg`);
+    return (`/img/miniature/${restaurant.photograph}.webp`);
   }
 
   /**
@@ -239,4 +416,52 @@ class DBHelper {
     return marker;
   }
 
+  static postponeRestaurant(restaurant) {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      const tx = db.transaction('postponedRestaurant', 'readwrite');
+      tx.objectStore('postponedRestaurant').put(restaurant, restaurant.id);
+      return tx.complete;
+    });
+  }
+
+  static postponeReview(newReview) {
+    const dbPromise = DBHelper.openIDB();
+    return dbPromise.then(db => {
+      const tx = db.transaction('postponedReview', 'readwrite');
+      tx.objectStore('postponedReview').put(newReview, newReview.key);
+      return tx.complete;
+    });
+  }
+
+  static sendPostponedRestaurants() {
+    DBHelper.selectFirstPostponedRestaurantFromIDB()
+      .then(function (postponedRestaurant) {
+        if (postponedRestaurant != null) {
+          console.log('Sending next postponed favorite change');
+
+          return DBHelper.postRestaurant(postponedRestaurant)
+            .then(() => DBHelper.deletePostponedRestaurantFromIDB(postponedRestaurant.id))
+            .then(() => DBHelper.sendPostponedRestaurants());
+        }
+      });
+  }
+
+  static sendPostponedReviews() {
+    DBHelper.selectFirstPostponedReviewFromIDB()
+      .then(function (postponedReview) {
+        if (postponedReview != null) {
+          console.log('Sending next postponed review');
+
+          return DBHelper.postReview(postponedReview)
+            .then(() => DBHelper.deletePostponedReviewFromIDB(postponedReview.key))
+            .then(() => DBHelper.sendPostponedReviews());
+        }
+      });
+  }
+
+  static sendPostponedRequests() {
+    DBHelper.sendPostponedRestaurants();
+    DBHelper.sendPostponedReviews();
+  }
 }

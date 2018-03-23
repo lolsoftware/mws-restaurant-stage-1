@@ -3,12 +3,12 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#252831"/>
+  <meta name="theme-color" content="#252831" />
   <link rel="manifest" href="/manifest.webmanifest">
   <!-- Normalize.css for better cross-browser consistency -->
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
   <!-- Main CSS file -->
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/restaurant.css" />
   <title>Restaurant Info</title>
 </head>
 
@@ -36,14 +36,23 @@
 
   <!-- Beginning main -->
   <main id="maincontent">
-    <!-- Beginning map -->
-    <section id="map-container" role="application" aria-label="Map with the restaurant">
-      <div id="map"></div>
-    </section>
-    <!-- End map -->
     <!-- Beginning restaurant -->
     <section id="restaurant-container">
-      <h2 id="restaurant-name" tabindex="0"></h2>
+      <div id="restaurant-name-and-favorites">
+        <div id="restaurant-name">
+          <h2 id="restaurant-name-text" tabindex="0"></h2>
+        </div>
+        <div id="restaurant-favorite">
+          <button id="favorite">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 36 36">
+              <g id="icon-star">
+                <path d="M20.388,10.918L32,12.118l-8.735,7.749L25.914,31.4l-9.893-6.088L6.127,31.4l2.695-11.533L0,12.118
+            l11.547-1.2L16.026,0.6L20.388,10.918z"></path>
+              </g>
+            </svg>
+          </button>
+        </div>
+      </div>
       <div id="restaurant-img-and-details">
         <div id="restaurant-div-with-img">
           <img id="restaurant-img" sizes="(max-width: 800px) 100vw, 50vw" alt="Picture of the restaurant" />
@@ -66,7 +75,44 @@
     <section id="reviews-container" tabindex="0">
       <ul id="reviews-list"></ul>
     </section>
+
+    <section id="add-review-container" tabindex="0">
+      <h4>Add your review</h4>
+      <form id="form-add-review">
+
+        <div class="form-section">
+          <label for="rating">Rating</label>
+          <select id="rating" name="rating">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+
+        <div class="form-section">
+          <label for="comments">Comments</label>
+          <textarea id="comments" name="comments"></textarea>
+        </div>
+
+        <div class="form-section">
+          <label for="name">Your name</label>
+          <input type="text" id="name" name="name" />
+        </div>
+
+        <div class="right">
+          <input type="submit" value="Add" title="Add review" />
+        </div>
+      </form>
+    </section>
     <!-- End reviews -->
+
+    <!-- Beginning map -->
+    <section id="map-container" role="application" aria-label="Map with the restaurant">
+      <div id="map"></div>
+    </section>
+    <!-- End map -->
   </main>
   <!-- End main -->
 
@@ -81,12 +127,9 @@
 
   <!-- Beginning scripts -->
   <script src="js/init-sw.js"></script>
-  <script src="js/idb.js"></script>
+  <script src="js/idb.min.js"></script>
   <script src="js/dbhelper.js"></script>
-  <script src="js/iolazy.min.js"></script>
   <script src="js/restaurant_info.js"></script>
-  <!-- Google Maps -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD3f9BNPXItMT8PZkfqlP7gNjzc4jBT4v8&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
 
 </body>

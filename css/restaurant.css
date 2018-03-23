@@ -1,0 +1,390 @@
+@charset "utf-8";
+/* CSS Document */
+
+body,td,th,p{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11pt;
+	color: #333;
+	line-height: 1.5;
+}
+@media screen and (min-width: 800px) {
+  body,td,th,p{
+    font-size: 12pt;
+  }
+}
+body {
+	background-color: #fdfdfd;
+	margin: 0;
+	position:relative;
+}
+ul, li {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	color: #333;
+}
+a {
+	color: orange;
+	text-decoration: none;
+}
+a:hover, a:focus {
+	color: #3397db;
+	text-decoration: none;
+}
+a img{
+	border: none 0px #fff;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0 0 20px;
+}
+article, aside, canvas, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+#maincontent {
+  background-color: #f3f3f3;
+  min-height: 100%;
+}
+#footer {
+  background-color: #444;
+  color: white;
+  font-size: 8pt;
+  letter-spacing: 1px;
+  padding: 25px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.hidden {
+  display: none !important;
+}
+/* ====================== Navigation ====================== */
+nav {
+  width: 100%;
+  height: 80px;
+  background-color: #252831;
+  text-align:center;
+}
+nav h1 {
+  margin: auto;
+}
+nav h1 a {
+  color: #fff;
+  
+  font-weight: 200;
+  letter-spacing: 10px;
+  text-transform: uppercase;
+}
+#navBreadcrumb {
+  text-align: left;
+}
+#breadcrumb {
+    padding: 10px 40px 16px;
+    list-style: none;
+    background-color: #eee;
+    font-size: 17px;
+    margin: 0;
+}
+
+/* Display list items side by side */
+#breadcrumb li {
+    display: inline;
+}
+
+/* Add a slash symbol (/) before/behind each list item */
+#breadcrumb li+li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+}
+
+/* Add a color to all links inside the list */
+#breadcrumb li a {
+    color: #024D92;
+    text-decoration: none;
+}
+
+/* Add a color on mouse-over */
+#breadcrumb li a:hover {
+    text-decoration: underline;
+}
+/* ====================== Map ====================== */
+#map-container {
+  height: 40vh;
+  padding-top: 30px;
+}
+#map {
+  height: 40vh;
+  width: 100%;
+  background-color: #ccc;
+}
+/* ====================== Restaurant Details ====================== */
+#restaurant-name-and-favorites{
+  display: flex;
+}
+#restaurant-name {
+  width: calc(100% - 30px);
+}
+#restaurant-favorite {
+  width: 30px;
+}
+@media screen and (min-width: 800px) {
+  #restaurant-name {
+    width: calc(100% - 40px);
+  }
+  #restaurant-favorite {
+    width: 40px;
+  }
+}
+#restaurant-name-text {
+  color: #703A00;
+  font-family: Arial,sans-serif;
+  font-size: 16pt;
+  font-weight: 200;
+  letter-spacing: 0;
+  margin: 15px 0 15px;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+@media screen and (min-width: 800px) {
+  #restaurant-name-text {
+    font-size: 20pt;
+  }
+}
+#restaurant-img {
+  width: auto;
+  max-width: 100%; 
+}
+#restaurant-details {
+  margin-top: 30px;
+}
+@media screen and (min-width: 800px) {
+  #restaurant-img-and-details {
+    display: flex;
+  }
+  #restaurant-div-with-img,
+  #restaurant-details {
+    width: 50%;
+  }
+  #restaurant-img {
+    margin-right: 20px;
+  }
+  #restaurant-details {
+    margin-top: 0;
+    margin-left: 20px;
+  }
+}
+#restaurant-details-inner {
+  background-color: white;
+  border-bottom: solid 1px black;
+}
+@media screen and (min-width: 800px) {
+  #restaurant-details-inner {
+    box-shadow: 10px 10px 5px grey;
+    border-bottom: none;
+  }
+}
+#restaurant-address {
+  font-size: 12pt;
+  margin: 10px 0px;
+}
+#restaurant-cuisine {
+  background-color: #333;
+  font-size: 11pt;
+  letter-spacing: 10px;
+  text-align: center;
+  text-transform: uppercase;
+	padding: 10px;
+  color: white;
+  font-weight: bold;
+  margin: 0;
+}
+@media screen and (min-width: 800px) {
+  #restaurant-cuisine {
+    font-size: 12pt;
+  }
+}
+div#restaurant-details-body {
+  padding: 10px 20px;
+}
+#restaurant-container, 
+#reviews-container,
+#add-review-container {
+  border-bottom: 1px solid #d9d9d9;
+  border-top: 1px solid #fff;
+  padding-top: 40px;
+  padding-bottom: 30px;
+  /*width: 50%;*/
+}
+#reviews-container,
+#add-review-container {
+  padding-top: 30px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+@media screen and (min-width: 800px) {
+  #restaurant-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+#reviews-container h3,
+#add-review-container h4 {
+  color: #703A00;
+  font-size: 18pt;
+  font-weight: 300;
+  letter-spacing: -1px;
+  padding-bottom: 1pt;
+}
+@media screen and (min-width: 800px) {
+  #reviews-container h3 {
+    font-size: 24pt;
+  }
+}
+#reviews-list {
+  margin: 0;
+  padding: 0;
+}
+#reviews-list li {
+  background-color: #fff;
+  box-shadow: 10px 10px 5px grey;
+  display: block;
+  list-style-type: none;
+  margin: 0 0 30px;
+  overflow: hidden;
+  position: relative;
+  /*max-width: 65em;*/
+  border-top-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+#reviews-list li div.review-body {
+  padding: 20px;
+}
+
+#reviews-list li p {
+  margin: 0;
+}
+#reviews-list li p.review-rating {
+  margin: 0 0 10px;
+}
+#restaurant-hours {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: separate;
+}
+#restaurant-hours tr td:first-child {
+  font-weight: bold;
+}
+#restaurant-hours tr td {
+  padding: 5px;
+}
+#restaurant-hours tr:nth-of-type(odd) {
+  background-color: #eee;
+}
+div.review-title {
+  display: flex;
+  justify-content: space-between;
+  background-color: #333333;
+}
+
+#reviews-list li div.review-title p {
+  color: white;
+  margin: 10px;
+}
+
+p.review-author {
+  font-weight: bold;
+}
+
+p.review-date {
+  color: #CCCCCC;
+}
+
+p.review-rating {
+  background-color: #FFA500;
+  padding: 5px 10px;
+  text-transform: uppercase;
+  color: black;
+  display: inline-block;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+button#favorite {
+  background: none !important;
+  border: none; 
+  padding: 0 !important;
+  font-family: arial,sans-serif;
+  color: #069;
+  text-decoration: underline;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+button#favorite svg {
+  fill: transparent;
+  stroke: red;
+  stroke-width: 2px;
+}
+
+button#favorite.is-favorite svg {
+  fill: red;
+}
+
+form input[type=text],
+form select,
+form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  display: block;
+  font-size: 11pt;
+  height: 35px;
+}
+
+@media screen and (min-width: 800px) {
+  form input[type=text],
+  form select,
+  form textarea {
+    font-size: 12pt;
+  }
+}
+
+form#form-add-review {
+  background-color: white;
+  padding: 20px;
+  border-radius: 25px;
+  box-shadow: 10px 10px 5px grey;
+}
+
+form input[type=submit] {
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+@media screen and (min-width: 800px) {
+  form input[type=submit] {
+    font-size: 16px;
+  }
+}
+
+.form-section {
+  margin-bottom: 15px;
+}
+
+form label {
+  display: inline-block;
+  max-width: 100%;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+@media screen and (min-width: 800px) {
+  form label {
+    font-size: 18px;
+  }
+}
+
+.right {
+  text-align: right;
+}

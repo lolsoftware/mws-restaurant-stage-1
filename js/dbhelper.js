@@ -372,29 +372,17 @@ class DBHelper {
   /**
    * Restaurant image URL.
    */
-  static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}.webp`);
-  }
+  static imageSrcsetForRestaurant(restaurant) {
+    let filename = restaurant.photograph;
 
-  /**
-   * Restaurant medium image URL.
-   */
-  static mediumImageUrlForRestaurant(restaurant) {
-    return (`/img/medium/${restaurant.photograph}.webp`);
-  }
+    if (filename == null) {
+      filename = "missing";
+    }
 
-  /**
-   * Restaurant small image URL.
-   */
-  static smallImageUrlForRestaurant(restaurant) {
-    return (`/img/small/${restaurant.photograph}.webp`);
-  }
-
-  /**
-   * Restaurant miniature image URL.
-   */
-  static miniatureImageUrlForRestaurant(restaurant) {
-    return (`/img/miniature/${restaurant.photograph}.webp`);
+    return `/img/miniature/${filename}.webp 270w, ` +
+      `/img/small/${filename}.webp 500w, ` +
+      `/img/medium/${filename}.webp 650w, ` +
+      `/img/${filename}.webp 800w`;
   }
 
   /**

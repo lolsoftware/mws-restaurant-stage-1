@@ -55,10 +55,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const image = document.getElementById('restaurant-img');
   image.className = "restaurant-img lazyload";
-  //image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.setAttribute('data-srcset', DBHelper.smallImageUrlForRestaurant(restaurant) + " 500w, " +
-    DBHelper.mediumImageUrlForRestaurant(restaurant) + " 650w, " +
-    DBHelper.imageUrlForRestaurant(restaurant) + " 800w");
+  image.setAttribute('data-srcset', DBHelper.imageSrcsetForRestaurant(restaurant));
   image.alt = `Picture of the "${restaurant.name}" restaurant`;
 
   const cuisine = document.getElementById('restaurant-cuisine');
